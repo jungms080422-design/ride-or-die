@@ -116,7 +116,8 @@ st.markdown(f"""
     /* (추가) 드롭다운 화살표 색상 */
     .stSelectbox svg {{
         fill: var(--primary-color) !important;
-    }}    /* <<< 2. 수정 끝 >>> */
+    }} 
+    /* <<< 2. 수정 끝 >>> */
 
     /* metric (수치 표시) */
     .stMetric {{
