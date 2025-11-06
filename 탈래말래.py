@@ -284,7 +284,7 @@ shared_state = get_shared_state() # 공유 상태를 사용
 # 로고 파일을 프로젝트 폴더 안에 'logo.png'로 저장하고 사용하세요.
 # 예: /your_project_folder/logo.png
 # 로고가 없으면 이 부분을 주석 처리하거나 다른 이미지로 대체하세요.
-st.image("logo.png", width=80) # 로고 파일 경로와 너비 설정
+st.image("test_logo.png", width=80) # 로고 파일 경로와 너비 설정
 st.title("탈래말래") # 앱 이름
 st.markdown("---") # 구분선
 
