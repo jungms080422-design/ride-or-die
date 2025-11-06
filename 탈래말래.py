@@ -7,6 +7,7 @@ import re # 2. 시간 형식 검증을 위해 re(정규식) 모듈을 가져옵�
 # --------------------------------------------------------------------------------
 # 1. 앱 상태 초기화 (Session State)
 # --------------------------------------------------------------------------------
+# ... (이전 코드와 동일, 생략) ...
 def initialize_state():
     if 'initialized' not in st.session_state:
         st.session_state.initialized = True # 초기화 완료 플래그
@@ -51,6 +52,7 @@ def initialize_state():
 # 2. 헬퍼 함수 (기능별 로직)
 # --------------------------------------------------------------------------------
 
+# ... (이전 코드와 동일, 생략) ...
 # (시뮬레이션) 혼잡도 데이터를 랜덤으로 새로고침하는 함수
 def update_congestion_data():
     """모든 층과 엘리베이터의 혼잡도를 랜덤으로 다시 설정합니다."""
@@ -144,6 +146,7 @@ def validate_time_format(time_str):
 initialize_state()
 
 # --- (신규) 로그인 게이트 ---
+# ... (이전 코드와 동일, 생략) ...
 if not st.session_state.logged_in:
     st.title("🏫 우리 학교 엘리베이터 앱 로그인")
     
@@ -164,6 +167,7 @@ else:
     # 로그인이 성공해야 아래의 모든 UI가 보임
 
     # --- 사이드바 UI (기능 조작부) ---
+    # ... (이전 코드와 동일, 생략) ...
     st.sidebar.title("🛠️ 기능 조작 패널")
     
     st.sidebar.markdown(f"**{st.session_state.user_name}**님 ( {st.session_state.user_id} )")
@@ -264,6 +268,7 @@ else:
     st.title("🏫 우리 학교 엘리베이터 앱")
 
     # --- (기능 6) 정기 알림판 ---
+    # ... (이전 코드와 동일, 생략) ...
     st.header("🔔 나의 맞춤 알림")
     
     # (수정 2) 문자열로 저장된 시간(alert_time_str)을 time 객체로 변환
@@ -292,6 +297,7 @@ else:
 
 
     # --- (기능 1, 2) 실시간 현황 ---
+    # ... (이전 코드와 동일, 생략) ...
     st.header("실시간 현황")
     st.caption("실제로는 카메라가 이 데이터를 업데이트합니다.")
     if st.button("현황 새로고침 (데이터 시뮬레이션)"):
@@ -321,11 +327,13 @@ else:
 
                 if reservation_list:
                     count = len(reservation_list)
+                    # (수정 1) popover 클릭 시 예약자 이름 없이 시간만 표시
                     with st.popover(f"🚑 예약 ({count}명)"):
-                        st.markdown(f"**{floor} 예약 현황**")
+                        st.markdown(f"**{floor} - 총 {count}건의 예약**")
                         sorted_reservations = sorted(reservation_list, key=lambda x: x['time'])
+                        # (수정 1) 이름(res['name'])을 제외하고 시간(res['time'])만 표시
                         for res in sorted_reservations:
-                            st.markdown(f"- **{res['name']}** ({res['time'].strftime('%H:%M')})")
+                            st.markdown(f"- {res['time'].strftime('%H:%M')}")
 
     # 3F, 4F, 5F
     cols_bottom = st.columns(3)
@@ -343,8 +351,10 @@ else:
                 
                 if reservation_list:
                     count = len(reservation_list)
+                    # (수정 1) popover 클릭 시 예약자 이름 없이 시간만 표시
                     with st.popover(f"🚑 예약 ({count}명)"):
-                        st.markdown(f"**{floor} 예약 현황**")
+                        st.markdown(f"**{floor} - 총 {count}건의 예약**")
                         sorted_reservations = sorted(reservation_list, key=lambda x: x['time'])
+                        # (수정 1) 이름(res['name'])을 제외하고 시간(res['time'])만 표시
                         for res in sorted_reservations:
-                            st.markdown(f"- **{res['name']}** ({res['time'].strftime('%H:%M')})")
+                            st.markdown(f"- {res['time'].strftime('%H:%M')}")
