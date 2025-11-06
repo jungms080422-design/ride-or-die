@@ -95,23 +95,28 @@ st.markdown(f"""
         font-family: var(--font-family);
     }}
 
-    /* <<< 2. 수정된 부분: Selectbox 스타일 >>> */
+/* <<< 2. 수정된 부분: Selectbox 스타일 >>> */
     .stSelectbox > div > div {{
         background-color: var(--secondary-color);
         border: none;
         border-radius: 12px;
         box-shadow: inset 2px 2px 5px var(--dark-shadow), inset -5px -5px 10px var(--light-shadow);
-        padding: 10px; /* 5px -> 10px (텍스트 입력 필드와 동일하게) */
-        color: #333333;
+        padding: 10px; 
         font-family: var(--font-family);
+        /* 겉 박스의 color: #333333; 는 삭제해도 됩니다. */
     }}
-    /* (기존) .stSelectbox > div > div > div {{ ... }} (제거됨) */
+
+    /* (추가) Selectbox '내부'의 텍스트 요소에 직접 스타일 적용 */
+    .stSelectbox > div > div > div {{
+         color: #333333 !important; /* 텍스트 색상 강제 지정 */
+         background-color: transparent !important; /* 내부 요소 배경 투명하게 */
+    }}
+    /* (추가 끝) */
 
     /* (추가) 드롭다운 화살표 색상 */
     .stSelectbox svg {{
         fill: var(--primary-color) !important;
-    }}
-    /* <<< 2. 수정 끝 >>> */
+    }}    /* <<< 2. 수정 끝 >>> */
 
     /* metric (수치 표시) */
     .stMetric {{
@@ -439,7 +444,7 @@ else:
         st.markdown("---") # 구분선
 
         # --- (기능 5) 캐시워크 ---
-        st.header("👟 캐시워크 (시연)")
+        st.header("👟 천보 걸을래 말래"
         st.caption("핸드폰 건강 앱의 걸음 수를 직접 입력하세요.")
         
         st.number_input(
