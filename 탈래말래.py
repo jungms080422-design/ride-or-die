@@ -95,28 +95,36 @@ st.markdown(f"""
         font-family: var(--font-family);
     }}
 
-/* <<< 2. 수정된 부분: Selectbox 스타일 >>> */
+/* <<< 2. 수정된 부분: Selectbox 스타일 (안정적인 '볼록한' 스타일로 변경) >>> */
+    /*
+        [수정 이유]
+        st.selectbox의 'inset(오목한)' 그림자는 Streamlit의 복잡한
+        내부 구조와 충돌하여 텍스트를 가리는 고질적인 문제가 있습니다.
+        가장 안정적인 해결책은 '볼록한(convex)' 스타일로 변경하는 것입니다.
+    */
     .stSelectbox > div > div {{
-        background-color: var(--secondary-color);
+        background-color: var(--secondary-color); /* 버튼과 동일한 배경 */
+        color: #333333; /* 텍스트 색상 */
         border: none;
         border-radius: 12px;
-        box-shadow: inset 2px 2px 5px var(--dark-shadow), inset -5px -5px 10px var(--light-shadow);
-        padding: 10px; 
+        
+        /* (핵심) 'inset' 대신 '볼록한' 그림자로 변경 (st.button과 유사) */
+        box-shadow: 6px 6px 12px var(--dark-shadow), -6px -6px 12px var(--light-shadow);
+        
+        padding: 10px; /* 텍스트를 위한 내부 패딩 */
         font-family: var(--font-family);
-        /* 겉 박스의 color: #333333; 는 삭제해도 됩니다. */
     }}
 
-    /* (추가) Selectbox '내부'의 텍스트 요소에 직접 스타일 적용 */
+    /* Selectbox 내부 텍스트 요소 (z-index 등 복잡한 설정 제거) */
     .stSelectbox > div > div > div {{
-         color: #333333 !important; /* 텍스트 색상 강제 지정 */
-         background-color: transparent !important; /* 내부 요소 배경 투명하게 */
+         color: #333333 !important;
+         background-color: transparent !important;
     }}
-    /* (추가 끝) */
-
-    /* (추가) 드롭다운 화살표 색상 */
+    
+    /* 드롭다운 화살표 색상 */
     .stSelectbox svg {{
         fill: var(--primary-color) !important;
-    }} 
+    }}
     /* <<< 2. 수정 끝 >>> */
 
     /* metric (수치 표시) */
