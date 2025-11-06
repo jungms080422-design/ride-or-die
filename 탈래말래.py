@@ -12,8 +12,8 @@ from io import BytesIO # Imgur 링크를 위해 추가
 
 # 1. 색상 팔레트 정의 (수정)
 PRIMARY_COLOR = "#0D47A1"  # 짙은 파란색 (포인트)
-BACKGROUND_COLOR = "#FFFFFF" # 하얀색 계열 배경
-SECONDARY_COLOR = "#F4F6F8" # 뉴모피즘 컴포넌트 배경
+BACKGROUND_COLOR = "#F4F6F8" # 하얀색 계열 배경
+SECONDARY_COLOR = "#FFFFFF" # 뉴모피즘 컴포넌트 배경
 ACCENT_COLOR = "#42A5F5"   # 밝은 파란색 (보조)
 
 # 2. 전역 CSS 스타일 (하얀 배경 뉴모피즘)
@@ -135,12 +135,12 @@ st.markdown(f"""
         box-shadow: 1px 1px 2px var(--dark-shadow), -1px -1px 2px var(--light-shadow);
     }}
 
-    /* 컨테이너 (border=True) */
+    /* 컨테이너 (border=True) - UI 글자 잘림 현상 해결 (padding 수정) */
     .stContainer {{
         background-color: var(--secondary-color);
-        border-radius: 15px; /* 더 둥글게 */
+        border-radius: 15px;
         box-shadow: 8px 8px 16px var(--dark-shadow), -8px -8px 16px var(--light-shadow);
-        padding: 20px;
+        padding: 15px; /* 20px -> 15px로 줄여 공간 확보 */
         margin-bottom: 20px;
     }}
     
@@ -328,7 +328,7 @@ shared_state = get_shared_state() # 공유 상태를 사용
 # --- 최상단 로고 및 앱 이름 (UI 추가 1) ---
 # Imgur 같은 곳에 이미지를 업로드하고, 그 '직접' 링크를 사용하세요.
 # 예: https://i.imgur.com/vL4GfNT.png (이것은 Streamlit 로고 예시입니다)
-LOGO_URL = "https://www.canva.com/design/DAG36eEclhg/Da6N9uT1r5t1lnrTtQp0mg/edit?utm_content=DAG36eEclhg&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton"
+LOGO_URL = "https://imgur.com/a/CvBZIEp" 
 
 # URL에서 이미지를 불러오는 로직
 try:
@@ -437,7 +437,7 @@ else:
         st.markdown("---") # 구분선
 
         # --- (기능 5) 캐시워크 ---
-        st.header("👟 천보 걸을래말래 (시연)")
+        st.header("👟 캐시워크 (시연)")
         st.caption("핸드폰 건강 앱의 걸음 수를 직접 입력하세요.")
         
         st.number_input(
@@ -523,14 +523,14 @@ else:
     for i in range(3): 
         floor = st.session_state.floors[i]
         with cols_top[i]:
-            st.markdown(f"### {floor}")
+            st.markdown(f"#### {floor}") # UI 글자 잘림 현상 해결 (h3 -> h4)
             
             reservation_list = get_shared_state()['reservations'][floor] # 공유 상태에서 읽기
             status = st.session_state.floor_congestion[floor]
             color_icon = st.session_state.congestion_colors[status]
 
             with st.container(border=True):
-                st.markdown(f"## {color_icon} {status}")
+                st.markdown(f"### {color_icon} {status}") # UI 글자 잘림 현상 해결 (h2 -> h3)
 
                 if reservation_list:
                     count = len(reservation_list)
@@ -547,14 +547,14 @@ else:
     for i in range(3): 
         floor = st.session_state.floors[i + 3] # 3, 4, 5
         with cols_bottom[i]:
-            st.markdown(f"### {floor}")
+            st.markdown(f"#### {floor}") # UI 글자 잘림 현상 해결 (h3 -> h4)
             
             reservation_list = get_shared_state()['reservations'][floor] # 공유 상태에서 읽기
             status = st.session_state.floor_congestion[floor]
             color_icon = st.session_state.congestion_colors[status]
 
             with st.container(border=True):
-                st.markdown(f"## {color_icon} {status}")
+                st.markdown(f"### {color_icon} {status}") # UI 글자 잘림 현상 해결 (h2 -> h3)
                 
                 if reservation_list:
                     count = len(reservation_list)
