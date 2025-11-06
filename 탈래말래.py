@@ -3,129 +3,157 @@ import random
 import time
 import datetime
 import re
+import requests # Imgur 링크를 위해 추가
+from io import BytesIO # Imgur 링크를 위해 추가
 
 # --------------------------------------------------------------------------------
-# 0. 전역 설정 및 디자인 (뉴모피즘)
+# 0. 전역 설정 및 디자인 (하얀 배경, 짙은 파란색 포인트)
 # --------------------------------------------------------------------------------
 
-# 1. 색상 팔레트 정의
-PRIMARY_COLOR = "#007BFF"  # 쨍한 파란색 (포인트)
-BACKGROUND_COLOR = "#E0E5EC" # 부드러운 회색/파란색 (뉴모피즘 배경)
-LIGHT_SHADOW = "#FFFFFF" # 밝은 그림자
-DARK_SHADOW = "#A3B1C6"  # 어두운 그림자
+# 1. 색상 팔레트 정의 (수정)
+PRIMARY_COLOR = "#0D47A1"  # 짙은 파란색 (포인트)
+BACKGROUND_COLOR = "#F4F6F8" # 하얀색 계열 배경
+SECONDARY_COLOR = "#FFFFFF" # 뉴모피즘 컴포넌트 배경
+ACCENT_COLOR = "#42A5F5"   # 밝은 파란색 (보조)
 
-# 2. 전역 CSS 스타일 (뉴모피즘 디자인 적용 시도)
-# Streamlit의 기본 UI를 오버라이드하여 뉴모피즘 느낌을 구현합니다.
-# 완벽하진 않지만, 유사한 시각적 효과를 줍니다.
+# 2. 전역 CSS 스타일 (하얀 배경 뉴모피즘)
 st.markdown(f"""
     <style>
-    /* 전체 배경색 */
+    /* Google Noto Sans KR 폰트 불러오기 */
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
+
+    /* CSS 변수 정의 */
+    :root {{
+        --primary-color: {PRIMARY_COLOR};
+        --background-color: {BACKGROUND_COLOR};
+        --secondary-color: {SECONDARY_COLOR};
+        --accent-color: {ACCENT_COLOR};
+        --light-shadow: rgba(255, 255, 255, 0.8); /* 밝은 그림자 */
+        --dark-shadow: rgba(174, 174, 192, 0.4);  /* 어두운 그림자 */
+        --font-family: 'Noto Sans KR', sans-serif; /* 폰트 적용 */
+    }}
+
+    /* 전체 배경색 및 폰트 */
     .stApp {{
-        background-color: {BACKGROUND_COLOR};
-        color: #333333; /* 기본 텍스트 색상 */
+        background-color: var(--background-color);
+        color: #333333;
+        font-family: var(--font-family);
     }}
 
     /* 사이드바 배경색 */
     .stSidebar {{
-        background-color: {BACKGROUND_COLOR};
+        background-color: var(--background-color);
+        border-right: 1px solid #E0E0E0;
+    }}
+    .stSidebar .st-emotion-cache-1jicfl2 {{
+         background-color: var(--background-color);
     }}
 
     /* 버튼 기본 스타일 (뉴모피즘) */
     .stButton > button {{
-        background-color: {BACKGROUND_COLOR};
+        background-color: var(--secondary-color);
         color: #333333;
         border: none;
         border-radius: 12px;
-        box-shadow: 6px 6px 12px {DARK_SHADOW}, -6px -6px 12px {LIGHT_SHADOW};
+        box-shadow: 6px 6px 12px var(--dark-shadow), -6px -6px 12px var(--light-shadow);
         transition: all 0.2s ease-in-out;
         padding: 10px 20px;
         font-weight: 600;
+        font-family: var(--font-family);
     }}
     .stButton > button:hover {{
-        box-shadow: 2px 2px 4px {DARK_SHADOW}, -2px -2px 4px {LIGHT_SHADOW};
+        box-shadow: 2px 2px 4px var(--dark-shadow), -2px -2px 4px var(--light-shadow);
         transform: scale(0.98);
     }}
     .stButton > button:active {{
-        box-shadow: inset 2px 2px 4px {DARK_SHADOW}, inset -2px -2px 4px {LIGHT_SHADOW};
+        box-shadow: inset 2px 2px 4px var(--dark-shadow), inset -2px -2px 4px var(--light-shadow);
     }}
 
-    /* 쨍한 파란색 버튼 (포인트) */
-    .stButton.primary-button > button {{
-        background-color: {PRIMARY_COLOR};
+    /* 짙은 파란색 버튼 (포인트) - type="primary" */
+    .stButton > button[kind="primary"] {{
+        background-color: var(--primary-color);
         color: white;
-        box-shadow: 6px 6px 12px {DARK_SHADOW}, -6px -6px 12px {LIGHT_SHADOW};
+        box-shadow: 6px 6px 12px var(--dark-shadow), -6px -6px 12px var(--light-shadow);
     }}
-    .stButton.primary-button > button:hover {{
-        background-color: #0069d9;
-        box-shadow: 2px 2px 4px {DARK_SHADOW}, -2px -2px 4px {LIGHT_SHADOW};
+    .stButton > button[kind="primary"]:hover {{
+        background-color: #0B3A80; /* 호버 시 조금 더 어둡게 */
+        box-shadow: 2px 2px 4px var(--dark-shadow), -2px -2px 4px var(--light-shadow);
     }}
-    .stButton.primary-button > button:active {{
-        box-shadow: inset 2px 2px 4px {DARK_SHADOW}, inset -2px -2px 4px {LIGHT_SHADOW};
+    .stButton > button[kind="primary"]:active {{
+        box-shadow: inset 2px 2px 4px var(--dark-shadow), inset -2px -2px 4px var(--light-shadow);
     }}
 
     /* 텍스트 입력 필드 */
-    .stTextInput > div > div > input {{
-        background-color: {BACKGROUND_COLOR};
+    .stTextInput > div > div > input,
+    .stNumberInput > div > div > input {{
+        background-color: var(--secondary-color);
         border: none;
         border-radius: 12px;
-        box-shadow: inset 2px 2px 5px {DARK_SHADOW}, inset -5px -5px 10px {LIGHT_SHADOW};
+        box-shadow: inset 2px 2px 5px var(--dark-shadow), inset -5px -5px 10px var(--light-shadow);
         padding: 10px;
         color: #333333;
+        font-family: var(--font-family);
     }}
 
     /* selectbox */
     .stSelectbox > div > div {{
-        background-color: {BACKGROUND_COLOR};
+        background-color: var(--secondary-color);
         border: none;
         border-radius: 12px;
-        box-shadow: inset 2px 2px 5px {DARK_SHADOW}, inset -5px -5px 10px {LIGHT_SHADOW};
+        box-shadow: inset 2px 2px 5px var(--dark-shadow), inset -5px -5px 10px var(--light-shadow);
         padding: 5px;
         color: #333333;
+        font-family: var(--font-family);
     }}
     .stSelectbox > div > div > div {{
-        background-color: {BACKGROUND_COLOR}; /* 드롭다운 메뉴 배경 */
+        background-color: var(--background-color);
     }}
 
     /* metric (수치 표시) */
     .stMetric {{
-        background-color: {BACKGROUND_COLOR};
+        background-color: var(--secondary-color);
         border-radius: 12px;
-        box-shadow: 6px 6px 12px {DARK_SHADOW}, -6px -6px 12px {LIGHT_SHADOW};
+        box-shadow: 6px 6px 12px var(--dark-shadow), -6px -6px 12px var(--light-shadow);
         padding: 15px;
         margin-bottom: 15px;
         text-align: center;
     }}
     .stMetric > div[data-testid="stMetricValue"] {{
-        color: {PRIMARY_COLOR}; /* 포인트 색상 */
+        color: var(--primary-color); /* 포인트 색상 */
+        font-weight: 700;
     }}
     
     /* popover (예약 현황) */
     .stPopover > button {{
-        background-color: {BACKGROUND_COLOR};
+        background-color: var(--secondary-color);
         border-radius: 12px;
-        box-shadow: 3px 3px 6px {DARK_SHADOW}, -3px -3px 6px {LIGHT_SHADOW};
+        box-shadow: 3px 3px 6px var(--dark-shadow), -3px -3px 6px var(--light-shadow);
+        color: var(--primary-color);
+        font-weight: 600;
     }}
     .stPopover > button:hover {{
-        box-shadow: 1px 1px 2px {DARK_SHADOW}, -1px -1px 2px {LIGHT_SHADOW};
+        box-shadow: 1px 1px 2px var(--dark-shadow), -1px -1px 2px var(--light-shadow);
     }}
 
     /* 컨테이너 (border=True) */
     .stContainer {{
-        background-color: {BACKGROUND_COLOR};
+        background-color: var(--secondary-color);
         border-radius: 15px; /* 더 둥글게 */
-        box-shadow: 8px 8px 16px {DARK_SHADOW}, -8px -8px 16px {LIGHT_SHADOW};
+        box-shadow: 8px 8px 16px var(--dark-shadow), -8px -8px 16px var(--light-shadow);
         padding: 20px;
         margin-bottom: 20px;
     }}
     
     /* 알림 메시지 (info, success, error 등) */
     .stAlert {{
-        background-color: {BACKGROUND_COLOR};
+        background-color: var(--secondary-color);
         border-radius: 12px;
-        box-shadow: inset 2px 2px 5px {DARK_SHADOW}, inset -5px -5px 10px {LIGHT_SHADOW};
+        box-shadow: inset 2px 2px 5px var(--dark-shadow), inset -5px -5px 10px var(--light-shadow);
         color: #333333;
+        font-family: var(--font-family);
+        border: none;
     }}
-    .stAlert.info {{ border-left: 8px solid #2196F3; }} /* 파란색 */
+    .stAlert.info {{ border-left: 8px solid var(--accent-color); }} /* 파란색 */
     .stAlert.success {{ border-left: 8px solid #4CAF50; }} /* 초록색 */
     .stAlert.error {{ border-left: 8px solid #F44336; }} /* 빨간색 */
     .stAlert.warning {{ border-left: 8px solid #FFC107; }} /* 노란색 */
@@ -134,7 +162,14 @@ st.markdown(f"""
     /* 헤더 스타일 */
     h1, h2, h3, h4, h5, h6 {{
         color: #333333;
-        text-shadow: 1px 1px 2px {LIGHT_SHADOW};
+        font-family: var(--font-family);
+        font-weight: 700;
+        text-shadow: 1px 1px 2px rgba(255,255,255,0.7);
+    }}
+    
+    /* 구분선 */
+    hr {{
+        background-color: var(--dark-shadow);
     }}
     </style>
 """, unsafe_allow_html=True)
@@ -241,13 +276,23 @@ def on_click_add_steps():
     current_cash = st.session_state.cashwalk['cash']
     if current_cash >= 100:
         st.sidebar.warning("오늘은 100캐시를 모두 적립했습니다.")
+        # 입력창 초기화는 여기서도 필요
+        st.session_state.steps_to_add_input = 0
         return
         
     st.session_state.cashwalk['steps'] += steps_to_add
     cash_to_add = (steps_to_add // 10) * 1
     new_cash = min(current_cash + cash_to_add, 100)
-    st.session_state.cashwalk['cash'] = new_cash
+    
+    added_cash = new_cash - current_cash
+    if added_cash > 0:
+        st.sidebar.success(f"{added_cash} 캐시 적립!")
+    elif cash_to_add > 0:
+         st.sidebar.warning("일일 최대 100캐시를 초과했습니다.")
+    else:
+        st.sidebar.info("캐시를 적립하기엔 걸음 수가 부족합니다. (10보당 1원)")
 
+    st.session_state.cashwalk['cash'] = new_cash
     st.session_state.steps_to_add_input = 0 # 로직 실행 후, 입력창을 0으로 리셋
 
 # (기능 6) 정기 알림 설정 저장 함수
@@ -281,29 +326,39 @@ initialize_state()
 shared_state = get_shared_state() # 공유 상태를 사용
 
 # --- 최상단 로고 및 앱 이름 (UI 추가 1) ---
-# 로고 파일을 프로젝트 폴더 안에 'logo.png'로 저장하고 사용하세요.
-# 예: /your_project_folder/logo.png
-# 로고가 없으면 이 부분을 주석 처리하거나 다른 이미지로 대체하세요.
-st.image("test_logo.png", width=80) # 로고 파일 경로와 너비 설정
+# Imgur 같은 곳에 이미지를 업로드하고, 그 '직접' 링크를 사용하세요.
+# 예: https://i.imgur.com/vL4GfNT.png (이것은 Streamlit 로고 예시입니다)
+LOGO_URL = "https://i.imgur.com/vL4GfNT.png" 
+
+# URL에서 이미지를 불러오는 로직
+try:
+    response = requests.get(LOGO_URL)
+    logo_image = BytesIO(response.content)
+    st.image(logo_image, width=80) # 로고 파일 경로와 너비 설정
+except Exception as e:
+    st.warning("로고 이미지를 불러오는 데 실패했습니다. URL을 확인하세요.")
+    # st.error(e) # 디버깅 시 사용
+
 st.title("탈래말래") # 앱 이름
 st.markdown("---") # 구분선
 
 # --- 로그인 게이트 ---
 if not st.session_state.logged_in:
-    st.header("🏫 우리 학교 엘리베이터 앱 로그인")
-    
-    user_id_input = st.text_input("학번", key="login_id")
-    user_name_input = st.text_input("이름", key="login_name")
-    
-    # 로그인 버튼에 primary-button 클래스 적용
-    if st.button("로그인", key="login_btn", help="로그인하려면 학번과 이름을 입력하세요.", type="primary"):
-        if user_id_input and user_name_input:
-            st.session_state.logged_in = True
-            st.session_state.user_id = user_id_input
-            st.session_state.user_name = user_name_input
-            st.rerun() 
-        else:
-            st.error("학번과 이름을 모두 입력해주세요.")
+    with st.container(border=True):
+        st.header("🏫 우리 학교 엘리베이터 앱 로그인")
+        
+        user_id_input = st.text_input("학번", key="login_id")
+        user_name_input = st.text_input("이름", key="login_name")
+        
+        # 로그인 버튼에 primary-button 클래스 적용
+        if st.button("로그인", key="login_btn", help="로그인하려면 학번과 이름을 입력하세요.", type="primary"):
+            if user_id_input and user_name_input:
+                st.session_state.logged_in = True
+                st.session_state.user_id = user_id_input
+                st.session_state.user_name = user_name_input
+                st.rerun() 
+            else:
+                st.error("학번과 이름을 모두 입력해주세요.")
 
 else:
     # --- 사이드바 UI (기능 조작 패널) ---
@@ -311,6 +366,10 @@ else:
         st.title("🛠️ 기능 조작 패널")
         st.markdown(f"**{st.session_state.user_name}**님 ( {st.session_state.user_id} )")
         if st.button("로그아웃", key="logout_btn"):
+            # 로그아웃 시 공유 상태 초기화 (선택 사항)
+            # shared_state = get_shared_state()
+            # shared_state['reservations'] = {floor: [] for floor in st.session_state.floors}
+            
             st.session_state.logged_in = False
             st.session_state.user_name = ""
             st.session_state.user_id = ""
@@ -356,7 +415,7 @@ else:
 
         selected_floor = st.selectbox("예약할 층", st.session_state.floors, key="reserve_floor_sel")
         
-        default_reserve_time_str = datetime.datetime.now().strftime('%H:%M')
+        default_reserve_time_str = (datetime.datetime.now() + datetime.timedelta(minutes=5)).strftime('%H:%M')
         selected_time_str = st.text_input(
             "예약 시간 (HH:MM):", 
             value=default_reserve_time_str, 
@@ -387,7 +446,7 @@ else:
             max_value=10000, 
             value=0, 
             step=100, 
-            key="steps_to_add_input"
+            key="steps_to_add_input" # 이 key를 콜백이 사용
         )
 
         st.button(
@@ -425,19 +484,26 @@ else:
         start_alert_time = (alert_datetime - datetime.timedelta(minutes=window_min)).time()
         end_alert_time = (alert_datetime + datetime.timedelta(minutes=window_min)).time()
         
-        if start_alert_time <= now_time <= end_alert_time:
-            status = st.session_state.floor_congestion[target_floor]
-            color_icon = st.session_state.congestion_colors[status]
-            st.error(f"💥 지금 {target_floor}로 갈 시간입니다! ( {alert_time_str} 알림 )\n\n## 현재 혼잡도: {color_icon} {status}")
-        else:
-            st.success(f"{target_floor} {alert_time_str} 알림이 설정되었습니다. ( {window_min}분 전후로 활성화됩니다 )")
+        # 알림창을 컨테이너로 감싸기
+        with st.container(border=True):
+            if start_alert_time <= now_time <= end_alert_time:
+                status = st.session_state.floor_congestion[target_floor]
+                color_icon = st.session_state.congestion_colors[status]
+                # st.error 대신 st.markdown으로 스타일링
+                st.markdown(f"### <span style='color: #F44336;'>💥 지금 {target_floor}로 갈 시간입니다!</span>", unsafe_allow_html=True)
+                st.markdown(f"#### ( {alert_time_str} 알림 )")
+                st.markdown(f"## 현재 혼잡도: {color_icon} {status}")
+            else:
+                # st.success 대신 st.markdown으로 스타일링
+                st.markdown(f"### <span style='color: #4CAF50;'>✅ {target_floor} {alert_time_str} 알림 설정됨</span>", unsafe_allow_html=True)
+                st.caption(f"( {window_min}분 전후로 활성화됩니다 )")
 
 
     # --- (기능 1, 2) 실시간 현황 ---
     st.subheader("실시간 현황")
     st.caption("실제로는 카메라가 이 데이터를 업데이트합니다.")
     
-    # 현황 새로고침 버튼에도 primary-button 클래스 적용
+    # 현황 새로고침 버튼
     if st.button("현황 새로고침 (데이터 시뮬레이션)", key="refresh_btn", type="primary"):
         update_congestion_data()
         
@@ -470,7 +536,9 @@ else:
                     count = len(reservation_list)
                     with st.popover(f"🚑 예약 ({count}명)"):
                         st.markdown(f"**{floor} - 총 {count}건의 예약**")
+                        # 예약 시간을 기준으로 정렬
                         sorted_reservations = sorted(reservation_list, key=lambda x: x['time'])
+                        # 이름(res['name']) 대신 시간만 표시
                         for res in sorted_reservations:
                             st.markdown(f"- {res['time'].strftime('%H:%M')}")
 
@@ -492,6 +560,8 @@ else:
                     count = len(reservation_list)
                     with st.popover(f"🚑 예약 ({count}명)"):
                         st.markdown(f"**{floor} - 총 {count}건의 예약**")
+                        # 예약 시간을 기준으로 정렬
                         sorted_reservations = sorted(reservation_list, key=lambda x: x['time'])
+                        # 이름(res['name']) 대신 시간만 표시
                         for res in sorted_reservations:
                             st.markdown(f"- {res['time'].strftime('%H:%M')}")
