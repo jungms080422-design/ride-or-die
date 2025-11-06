@@ -3,8 +3,8 @@ import random
 import time
 import datetime
 import re
-import requests # Imgur 링크를 위해 추가
-from io import BytesIO # Imgur 링크를 위해 추가
+# import requests # <<< 1. 수정된 부분 (로고 파일 로드에 더 이상 필요 없음)
+# from io import BytesIO # <<< 1. 수정된 부분 (로고 파일 로드에 더 이상 필요 없음)
 
 # --------------------------------------------------------------------------------
 # 0. 전역 설정 및 디자인 (하얀 배경, 짙은 파란색 포인트)
@@ -95,19 +95,23 @@ st.markdown(f"""
         font-family: var(--font-family);
     }}
 
-    /* selectbox */
+    /* <<< 2. 수정된 부분: Selectbox 스타일 >>> */
     .stSelectbox > div > div {{
         background-color: var(--secondary-color);
         border: none;
         border-radius: 12px;
         box-shadow: inset 2px 2px 5px var(--dark-shadow), inset -5px -5px 10px var(--light-shadow);
-        padding: 5px;
+        padding: 10px; /* 5px -> 10px (텍스트 입력 필드와 동일하게) */
         color: #333333;
         font-family: var(--font-family);
     }}
-    .stSelectbox > div > div > div {{
-        background-color: var(--background-color);
+    /* (기존) .stSelectbox > div > div > div {{ ... }} (제거됨) */
+
+    /* (추가) 드롭다운 화살표 색상 */
+    .stSelectbox svg {{
+        fill: var(--primary-color) !important;
     }}
+    /* <<< 2. 수정 끝 >>> */
 
     /* metric (수치 표시) */
     .stMetric {{
@@ -326,18 +330,16 @@ initialize_state()
 shared_state = get_shared_state() # 공유 상태를 사용
 
 # --- 최상단 로고 및 앱 이름 (UI 추가 1) ---
-# Imgur 같은 곳에 이미지를 업로드하고, 그 '직접' 링크를 사용하세요.
-# 예: https://i.imgur.com/vL4GfNT.png (이것은 Streamlit 로고 예시입니다)
-LOGO_URL = "https://imgur.com/a/CvBZIEp" 
+# <<< 1. 수정된 부분: 로컬 PNG 파일 사용 >>>
+# (Replit에 'logo.png' 파일을 업로드해야 합니다)
+LOGO_FILE = "logo.png" 
 
-# URL에서 이미지를 불러오는 로직
 try:
-    response = requests.get(LOGO_URL)
-    logo_image = BytesIO(response.content)
-    st.image(logo_image, width=80) # 로고 파일 경로와 너비 설정
+    st.image(LOGO_FILE, width=80) # 로고 파일 경로와 너비 설정
 except Exception as e:
-    st.warning("로고 이미지를 불러오는 데 실패했습니다. URL을 확인하세요.")
+    st.warning("로고 파일(logo.png)을 불러오는 데 실패했습니다. Replit에 파일이 업로드되었는지 확인하세요.")
     # st.error(e) # 디버깅 시 사용
+# <<< 1. 수정 끝 >>>
 
 st.title("탈래말래") # 앱 이름
 st.markdown("---") # 구분선
