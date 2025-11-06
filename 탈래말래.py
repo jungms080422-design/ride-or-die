@@ -12,8 +12,8 @@ from io import BytesIO # Imgur 링크를 위해 추가
 
 # 1. 색상 팔레트 정의 (수정)
 PRIMARY_COLOR = "#0D47A1"  # 짙은 파란색 (포인트)
-BACKGROUND_COLOR = "#F4F6F8" # 하얀색 계열 배경
-SECONDARY_COLOR = "#FFFFFF" # 뉴모피즘 컴포넌트 배경
+BACKGROUND_COLOR = "#FFFFFF" # 하얀색 계열 배경
+SECONDARY_COLOR = "#F4F6F8" # 뉴모피즘 컴포넌트 배경
 ACCENT_COLOR = "#42A5F5"   # 밝은 파란색 (보조)
 
 # 2. 전역 CSS 스타일 (하얀 배경 뉴모피즘)
