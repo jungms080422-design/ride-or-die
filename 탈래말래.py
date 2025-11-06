@@ -328,7 +328,7 @@ shared_state = get_shared_state() # 공유 상태를 사용
 # --- 최상단 로고 및 앱 이름 (UI 추가 1) ---
 # Imgur 같은 곳에 이미지를 업로드하고, 그 '직접' 링크를 사용하세요.
 # 예: https://i.imgur.com/vL4GfNT.png (이것은 Streamlit 로고 예시입니다)
-LOGO_URL = "https://i.imgur.com/vL4GfNT.png" 
+LOGO_URL = "https://www.canva.com/design/DAG36eEclhg/Da6N9uT1r5t1lnrTtQp0mg/edit?utm_content=DAG36eEclhg&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton"
 
 # URL에서 이미지를 불러오는 로직
 try:
@@ -437,7 +437,7 @@ else:
         st.markdown("---") # 구분선
 
         # --- (기능 5) 캐시워크 ---
-        st.header("👟 캐시워크 (시연)")
+        st.header("👟 천보 걸을래말래 (시연)")
         st.caption("핸드폰 건강 앱의 걸음 수를 직접 입력하세요.")
         
         st.number_input(
